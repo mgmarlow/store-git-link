@@ -1,3 +1,5 @@
+.PHONY: build test clean
+
 build: clean
 	emacs -batch -L . -f batch-byte-compile store-git-link.el
 
