@@ -2,7 +2,7 @@
 
 A command to easily share code links with colleagues.
 
-e.g. `M-x store-code-link`: https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12
+e.g. `M-x store-git-link`: https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12
 
 ## Installation
 
