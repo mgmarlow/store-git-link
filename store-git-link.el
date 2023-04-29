@@ -20,7 +20,12 @@
 
 ;;; Commentary:
 
+;; Provides the command `store-git-link' that saves a link to the current
+;; point as a URI to the remote host. This makes it easy to share reference
+;; links with colleagues when digging through code on your local machine.
 ;;
+;; E.g. M-x store-code-link ->
+;;   https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12
 
 ;;; Code:
 
@@ -42,15 +47,15 @@
 
 (defun sgl--format (basename branch rel-filename loc)
   "Root formatter. Assigns format function based on BASENAME."
-  (cond ((s-contains? "github.com" basename)
+  (cond ((string-match-p "github.com" basename)
          (sgl--format-github basename branch rel-filename loc))
-        ((s-contains? "git.sr.ht" basename)
+        ((string-match-p "git.sr.ht" basename)
          (sgl--format-sourcehut basename branch rel-filename loc))
         (t (error "Unsupported git remote passed to `sgl--format'."))))
 
 (defun sgl--maybe-remove-extension (uri)
   "Removes '.git' from a repo URI, if it exists."
-  (if (s-ends-with? ".git" uri)
+  (if (string-suffix-p ".git" uri)
       (substring uri 0 (* (length ".git") -1))
     uri))
 
@@ -72,7 +77,7 @@ git@git.sr.ht:~user/repo     -> git.sr.ht/~user/repo"
 
 (defun sgl--repo-basename (repo-uri)
   "Extracts basename from repository URI."
-  (if (s-starts-with? "https" repo-uri)
+  (if (string-prefix-p "https" repo-uri)
         (sgl--https-basename repo-uri)
       (sgl--ssh-basename repo-uri)))
 
