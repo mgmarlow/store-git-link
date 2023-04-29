@@ -1,4 +1,4 @@
-;;; store-vcs-link.el --- Stores a web link to VCS repository at current point  -*- lexical-binding: t; -*-
+;;; store-git-link.el --- Stores a web link to git repository at current point  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023  Graham Marlow
 
@@ -24,6 +24,22 @@
 
 ;;; Code:
 
+(require 'vc)
 
-(provide 'store-vcs-link)
-;;; store-vcs-link.el ends here
+(defun store-code-link--generate-link (filename)
+  (let ((rel-filename (file-relative-name filename (vc-root-dir))))))
+
+(vc-git-registered (buffer-file-name (current-buffer)))
+
+(defun store-git-link ()
+  "Store a web link to git repository at current point in the kill ring."
+  (interactive)
+  (let ((filename (buffer-file-name (current-buffer))))
+    (unless (vc-git-registered filename)
+      (error "File not tracked by git."))
+    (let ((code-link (store-git-link--generate-link filename)))
+      (kill-new code-link)
+      (message (concat "Copied " code-link " to clipboard.")))))
+
+(provide 'store-git-link)
+;;; store-git-link.el ends here
