@@ -9,5 +9,5 @@ e.g. `M-x store-git-link`: https://github.com/mgmarlow/store-git-link/blob/main/
 With Emacs 29:
 
 ```elisp
-(package-vc-install "https://github.com/mgmarlow/store-git-link.git")
+(package-vc-install "https://git.sr.ht/~mgmarlow/store-git-link")
 ```
