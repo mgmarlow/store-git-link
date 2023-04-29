@@ -90,6 +90,7 @@ Uses BRANCHNAME or defaults to first result of `vc-git-branches'."
         (rel-filename (file-relative-name filename (vc-root-dir))))
     (sgl--format basename branch rel-filename (line-number-at-pos))))
 
+;;;###autoload
 (defun store-git-link ()
   "Store a web link to git repository at current point in the kill ring."
   (interactive)
