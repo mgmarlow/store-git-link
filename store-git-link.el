@@ -94,8 +94,8 @@ Uses BRANCHNAME or defaults to first result of `vc-git-branches'."
   "Store a web link to git repository at current point in the kill ring."
   (interactive)
   (let ((filename (buffer-file-name (current-buffer))))
-    (unless (vc-git-registered filename)
-      (error "File not tracked by git."))
+    (unless (and filename (vc-git-registered filename))
+      (error "File must be version controlled by git to use `store-git-link'."))
     (let ((code-link (sgl--generate-link filename)))
       (kill-new code-link)
       (message (concat "Copied " code-link " to clipboard.")))))
