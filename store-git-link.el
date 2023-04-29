@@ -26,10 +26,64 @@
 
 (require 'vc)
 
-(defun store-code-link--generate-link (filename)
-  (let ((rel-filename (file-relative-name filename (vc-root-dir))))))
+(defun sgl--format-sourcehut (basename branch rel-filename loc)
+  "Formats a Sourcehut link."
+  (format "https://%s/tree/%s/item/%s"
+          basename
+          branch
+          (concat rel-filename "#L" (number-to-string loc))))
 
-(vc-git-registered (buffer-file-name (current-buffer)))
+(defun sgl--format-github (basename branch rel-filename loc)
+  "Formats a Github link."
+  (format "https://%s/blob/%s/%s"
+          basename
+          branch
+          (concat rel-filename "#L" (number-to-string loc))))
+
+(defun sgl--format (basename branch rel-filename loc)
+  "Root formatter. Assigns format function based on BASENAME."
+  (cond ((s-contains? "github.com" basename)
+         (sgl--format-github basename branch rel-filename loc))
+        ((s-contains? "git.sr.ht" basename)
+         (sgl--format-sourcehut basename branch rel-filename loc))
+        (t (error "Unsupported git remote passed to `sgl--format'."))))
+
+(defun sgl--maybe-remove-extension (uri)
+  "Removes '.git' from a repo URI, if it exists."
+  (if (s-ends-with? ".git" uri)
+      (substring uri 0 (* (length ".git") -1))
+    uri))
+
+(defun sgl--https-basename (repo-uri)
+  "Extracts basename from HTTPS repository URI.
+
+Examples:
+https://github.com/user/repo.git -> github.com/user/repo"
+  (sgl--maybe-remove-extension (substring repo-uri (length "https://"))))
+
+(defun sgl--ssh-basename (repo-uri)
+  "Extracts basename from SSH repository URI.
+
+Examples:
+git@github.com:user/repo.git -> github.com/user/repo
+git@git.sr.ht:~user/repo     -> git.sr.ht/~user/repo"
+  (sgl--maybe-remove-extension
+   (replace-regexp-in-string ":" "/" (substring repo-uri (length "git@")))))
+
+(defun sgl--repo-basename (repo-uri)
+  "Extracts basename from repository URI."
+  (if (s-starts-with? "https" repo-uri)
+        (sgl--https-basename repo-uri)
+      (sgl--ssh-basename repo-uri)))
+
+(defun sgl--generate-link (filename &optional branchname)
+  "Returns a git link.
+
+Uses BRANCHNAME or defaults to first result of `vc-git-branches'."
+  (let ((basename (sgl--repo-basename (vc-git-repository-url filename)))
+        (branch (or branchname (car (vc-git-branches))))
+        (rel-filename (file-relative-name filename (vc-root-dir))))
+    (sgl--format basename branch rel-filename (line-number-at-pos))))
 
 (defun store-git-link ()
   "Store a web link to git repository at current point in the kill ring."
@@ -37,7 +91,7 @@
   (let ((filename (buffer-file-name (current-buffer))))
     (unless (vc-git-registered filename)
       (error "File not tracked by git."))
-    (let ((code-link (store-git-link--generate-link filename)))
+    (let ((code-link (sgl--generate-link filename)))
       (kill-new code-link)
       (message (concat "Copied " code-link " to clipboard.")))))
 
