@@ -2,13 +2,7 @@
 
 A command to easily share code links with colleagues. Currently supports Github and Sourcehut.
 
-Example:
-
-```
-M-x store-git-link
-
-> Copied "https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12" to clipboard.
-```
+`M-x store-git-link`: "Copied https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12 to clipboard".
 
 ## Installation
 
