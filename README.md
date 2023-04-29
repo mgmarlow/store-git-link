@@ -1,6 +1,6 @@
 # store-git-link
 
-A command to easily share code links with colleagues. Currently supports Github and Sourcehut.
+An emacs package for sharing code links with colleagues. Currently supports Github and Sourcehut.
 
 ## Commands
 
