@@ -20,6 +20,8 @@
 
 ;;; Commentary:
 
+;; An emacs package for sharing code links with colleagues.
+;;
 ;; Provides the command `store-git-link' that saves a link to the current
 ;; point as a URI to the remote host. This makes it easy to share reference
 ;; links with colleagues when digging through code on your local machine.
@@ -30,6 +32,18 @@
 ;;; Code:
 
 (require 'vc)
+(require 'vc-git)
+
+(defgroup store-git-link ()
+  "Generate links to git repositories directly from source."
+  :group 'tools)
+
+(defcustom sgl-prefer-current-branch t
+  "If non-nil, always selects the current branch when generating links.
+
+When nil, opens a minibuffer prompt for branch selection."
+  :group 'store-git-link
+  :type 'boolean)
 
 (defun sgl--format-sourcehut (basename branch rel-filename loc)
   "Formats a Sourcehut link."
@@ -81,12 +95,18 @@ git@git.sr.ht:~user/repo     -> git.sr.ht/~user/repo"
         (sgl--https-basename repo-uri)
       (sgl--ssh-basename repo-uri)))
 
-(defun sgl--generate-link (filename &optional branchname)
-  "Returns a git link.
+(defun sgl--branch-prompt ()
+  "When `sgl-prefer-current-branch' is nil, prompt for branch selection
+if there's more than one choice. Otherwise use the current branch."
+  (let ((branches (vc-git-branches)))
+    (if (or sgl-prefer-current-branch (= (length branches) 1))
+        (car branches)
+      (completing-read "Pick a branch: " branches nil t))))
 
-Uses BRANCHNAME or defaults to first result of `vc-git-branches'."
+(defun sgl--generate-link (filename)
+  "Generates a link to the repository of current buffer at current line number."
   (let ((basename (sgl--repo-basename (vc-git-repository-url filename)))
-        (branch (or branchname (car (vc-git-branches))))
+        (branch (sgl--branch-prompt))
         (rel-filename (file-relative-name filename (vc-root-dir))))
     (sgl--format basename branch rel-filename (line-number-at-pos))))
 
