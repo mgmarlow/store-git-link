@@ -110,6 +110,10 @@ if there's more than one choice. Otherwise use the current branch."
         (rel-filename (file-relative-name filename (vc-root-dir))))
     (sgl--format basename branch rel-filename (line-number-at-pos))))
 
+(defun sgl--copy-link (link)
+  (kill-new link)
+  (message (concat "Copied " link " to clipboard.")))
+
 ;;;###autoload
 (defun store-git-link ()
   "Store a web link to git repository at current point in the kill ring."
@@ -117,9 +121,41 @@ if there's more than one choice. Otherwise use the current branch."
   (let ((filename (buffer-file-name (current-buffer))))
     (unless (and filename (vc-git-registered filename))
       (error "File must be version controlled by git to use `store-git-link'."))
-    (let ((code-link (sgl--generate-link filename)))
-      (kill-new code-link)
-      (message (concat "Copied " code-link " to clipboard.")))))
+    (sgl--copy-link (sgl--generate-link filename))))
+
+(defun sgl--format-commit (basename commit)
+  (format "https://%s/commit/%s" basename commit))
+
+(defun sgl--blame (filename loc)
+  "Calls git blame on filename with LOC, converting output to a string."
+  (let* ((loc (number-to-string loc))
+         (command (concat "git blame " filename " -L " loc "," loc))
+         (result (shell-command-to-string command)))
+    (when (string-prefix-p "fatal" result)
+      (error result))
+    result))
+
+(defun sgl--extract-commit (blame-string)
+  "Extracts commit hash from blame string, stripping leading ^ if present."
+  (let ((hash (car (string-split blame-string " "))))
+    (if (string-prefix-p "^" hash)
+        (substring hash 1)
+      hash)))
+
+(defun sgl--commit (filename loc)
+  "Returns commit hash from git blame for filename at LOC."
+  (sgl--extract-commit (sgl--blame filename loc)))
+
+;;;###autoload
+(defun store-git-link-commit ()
+  "Store a link to the commit associated with current point in the kill ring."
+  (interactive)
+  (let ((filename (buffer-file-name (current-buffer))))
+    (unless (and filename (vc-git-registered filename))
+      (error "File must be version controlled by git to use `store-git-link-commit'."))
+    (let ((basename (sgl--repo-basename (vc-git-repository-url filename)))
+          (commit (sgl--commit filename (line-number-at-pos))))
+      (sgl--copy-link (sgl--format-commit basename commit)))))
 
 (provide 'store-git-link)
 ;;; store-git-link.el ends here

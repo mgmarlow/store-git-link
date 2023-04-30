@@ -20,3 +20,17 @@
                  "https://github.com/user/repo/blob/main/foo/bar.el#L323"))
   (should (equal (sgl--format "git.sr.ht/~user/repo" "main" "foo/bar.el" 323)
                  "https://git.sr.ht/~user/repo/tree/main/item/foo/bar.el#L323")))
+
+(ert-deftest sgl-test-extract-commit ()
+  "Test commit extraction from git blame."
+  (should (equal (sgl--extract-commit "002c05b6 (mgmarlow 2023-04-29 10:09:12 -0700 77)   \"Extracts basename from HTTPS repository URI.")
+                 "002c05b6"))
+  (should (equal (sgl--extract-commit "^002c05b6 (mgmarlow 2023-04-29 10:09:12 -0700 77)   \"Extracts basename from HTTPS repository URI.")
+                 "002c05b6")))
+
+(ert-deftest sgl-test-format-commit ()
+  "Tests commit link formatting."
+  (should (equal (sgl--format-commit "github.com/user/repo" "002c05b6")
+                 "https://github.com/user/repo/commit/002c05b6"))
+  (should (equal (sgl--format-commit "git.sr.ht/~user/repo" "002c05b6")
+                 "https://git.sr.ht/~user/repo/commit/002c05b6")))
