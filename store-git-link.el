@@ -20,14 +20,12 @@
 
 ;;; Commentary:
 
-;; An emacs package for sharing code links with colleagues.
+;; A tiny emacs package for sharing code links with colleagues. Currently
+;; supports Github and Sourcehut.
 ;;
-;; Provides the command `store-git-link' that saves a link to the current
-;; point as a URI to the remote host. This makes it easy to share reference
-;; links with colleagues when digging through code on your local machine.
-;;
-;; E.g. M-x store-code-link ->
-;;   https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12
+;; - `store-git-link': Copies a link to the current line of code.
+;; - `store-git-link-commit': Copies a link to the commit hash associated
+;;   responsible for the current line of code, determined via git blame.
 
 ;;; Code:
 

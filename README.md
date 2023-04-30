@@ -4,7 +4,8 @@ An emacs package for sharing code links with colleagues. Currently supports Gith
 
 ## Commands
 
-- `M-x store-git-link`: Copies point in buffer as a link to the git repository. e.g. https://github.com/mgmarlow/store-git-link/blob/main/store-git-link-test.el#L12.
+- `M-x store-git-link`: Copies a link to the current line of code.
+- `M-x store-git-link-commit`: Copies a link to the commit hash associated responsible for the current line of code, determined via `git blame`.
 
 ## Installation
 
