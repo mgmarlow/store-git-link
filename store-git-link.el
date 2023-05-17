@@ -1,4 +1,4 @@
-;;; store-git-link.el --- Stores a web link to git repository at current point  -*- lexical-binding: t; -*-
+;;; store-git-link.el ---  A tiny emacs package for sharing code links with colleagues -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023  Graham Marlow
 
@@ -123,6 +123,15 @@ if there's more than one choice. Otherwise use the current branch."
 
 (defun sgl--format-commit (basename commit)
   (format "https://%s/commit/%s" basename commit))
+
+;; (apply #'process-file vc-git-program nil buffer nil "--no-pager" command args)
+(defun sgl--git-blame (file start end &optional buffer)
+  (vc-git-command (or buffer "*vc-blame*") 0 nil "blame" "-L" (concat start "," end)))
+
+(defun sgl--git-blame-at-point ()
+  (let ((loc (int-to-string (line-number-at-pos))))
+    (with-temp-buffer
+      (sgl--git-blame (buffer-file-name (current-buffer)) loc loc))))
 
 (defun sgl--blame (filename loc)
   "Calls git blame on filename with LOC, converting output to a string."
