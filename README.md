@@ -12,8 +12,8 @@ An emacs package for sharing code links with colleagues. Currently supports Gith
 With Emacs 29:
 
 ```elisp
-(unless (package-installed-p 'store-git-link)
-  (package-vc-install "https://git.sr.ht/~mgmarlow/store-git-link"))
+(use-package store-git-link
+  :vc (:fetcher sourcehut :repo mgmarlow/store-git-link))
 ```
 
 ## License
