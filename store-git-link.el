@@ -36,6 +36,11 @@
   "Generate links to git repositories directly from source."
   :group 'tools)
 
+(defcustom sgl-open-links-in-browser nil
+  "If non-nil, opens links in your default browser when copied."
+  :group 'store-git-link
+  :type 'boolean)
+
 (defcustom sgl-prefer-current-branch t
   "If non-nil, always selects the current branch when generating links.
 
@@ -110,6 +115,8 @@ if there's more than one choice. Otherwise use the current branch."
 
 (defun sgl--copy-link (link)
   (kill-new link)
+  (when sgl-open-links-in-browser
+    (browse-url link))
   (message (concat "Copied " link " to clipboard.")))
 
 ;;;###autoload
