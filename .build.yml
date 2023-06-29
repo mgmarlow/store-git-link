@@ -1,0 +1,8 @@
+image: debian/stable
+packages:
+  - emacs
+sources: https://git.sr.ht/~mgmarlow/store-git-link
+tasks:
+  - test: |
+      cd store-git-link
+      make test
