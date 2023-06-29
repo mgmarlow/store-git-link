@@ -141,7 +141,7 @@ are forwarded into the git blame command."
 
 (defun sgl--extract-commit (blame-string)
   "Extract commit hash from BLAME-STRING, stripping leading ^ if present."
-  (let ((hash (car (string-split blame-string " "))))
+  (let ((hash (car (split-string blame-string " "))))
     (if (string-prefix-p "^" hash)
         (substring hash 1)
       hash)))
